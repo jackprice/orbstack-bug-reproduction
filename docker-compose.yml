@@ -1,0 +1,38 @@
+---
+version: '3.7'
+name: orbstack-test
+services:
+  test:
+    image: webdevops/php-nginx:8.0
+    restart: unless-stopped
+    volumes:
+      - '.:/app'
+    ports:
+      - "80"
+    networks:
+      - test
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:9.6
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "test" ]
+    restart: unless-stopped
+    ports:
+      - "5432"
+    environment:
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: test
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    networks:
+      - test
+
+volumes:
+  postgres: { }
+networks:
+  test: {}
+...
